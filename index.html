@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlantic Pro Concrete & Foundation Estimator (Canada)</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary: #c85a17; /* Construction Safety Orange / Rust */
+      --secondary: #2b3a42;
+      --bg: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --border: #cbd5e1;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .container { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 10px;
+      padding: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--border);
+    }
+
+    .header-bar {
+      grid-column: 1 / -1;
+      background: var(--secondary);
+      color: white;
+      padding: 16px 24px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-bar h1 { margin: 0; font-size: 1.4rem; }
+    .unit-toggle button {
+      padding: 8px 16px;
+      border: none;
+      background: #475569;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .unit-toggle button.active {
+      background: var(--primary);
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #475569;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .results-box {
+      background: #f8fafc;
+      border-left: 4px solid var(--primary);
+      padding: 16px;
+      margin-bottom: 20px;
+      border-radius: 0 6px 6px 0;
+    }
+
+    .stat-val {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--secondary);
+    }
+
+    .btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-weight: bold;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .btn:hover { opacity: 0.9; }
+
+    /* Monetization Banner Mockup */
+    .ad-banner {
+      grid-column: 1 / -1;
+      background: #e2e8f0;
+      border: 2px dashed #94a3b8;
+      padding: 15px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #475569;
+      border-radius: 6px;
+    }
+
+    .lead-form-card {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  
+  <div class="header-bar">
+    <h1>Atlantic Pro Concrete Estimator (NS / CAD)</h1>
+    <div class="unit-toggle">
+      <button id="btn-metric" class="active" onclick="setUnits('metric')">Metric (m³)</button>
+      <button id="btn-imperial" onclick="setUnits('imperial')">Imperial (yd³)</button>
+    </div>
+  </div>
+
+  <!-- INPUT FORM CARD -->
+  <div class="card">
+    <h2>1. Project Dimensions</h2>
+    
+    <div class="form-group">
+      <label>Project Type</label>
+      <select id="projType" onchange="calculate()">
+        <option value="slab">Concrete Slab / Garage Floor</option>
+        <option value="footing">Strip Footing / Foundation</option>
+        <option value="wall">Foundation Wall</option>
+      </select>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-group">
+        <label id="lbl-length">Length (m)</label>
+        <input type="number" id="length" value="10" step="0.1" oninput="calculate()">
+      </div>
+      <div class="form-group">
+        <label id="lbl-width">Width (m)</label>
+        <input type="number" id="width" value="6" step="0.1" oninput="calculate()">
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-group">
+        <label id="lbl-thickness">Thickness / Height (mm)</label>
+        <input type="number" id="thickness" value="150" step="10" oninput="calculate()">
+      </div>
+      <div class="form-group">
+        <label>Waste Factor (%)</label>
+        <input type="number" id="waste" value="10" step="1" oninput="calculate()">
+      </div>
+    </div>
+
+    <h2>2. Pricing & Provincial Setup</h2>
+    <div class="grid-2">
+      <div class="form-group">
+        <label id="lbl-ready-mix">Ready-Mix Cost ($ CAD / m³)</label>
+        <input type="number" id="costConcrete" value="260" oninput="calculate()">
+      </div>
+      <div class="form-group">
+        <label>Tax Rate (% HST / GST)</label>
+        <input type="number" id="taxRate" value="15" oninput="calculate()">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Rebar Grid Spacing (mm / inches)</label>
+      <select id="rebarGrid" onchange="calculate()">
+        <option value="400">400 mm (~16 in) Grid</option>
+        <option value="300">300 mm (~12 in) Grid</option>
+        <option value="0">No Rebar</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- OUTPUT & CALCULATIONS CARD -->
+  <div class="card">
+    <h2>Material Breakdown</h2>
+    
+    <div class="results-box">
+      <div>Total Ready-Mix Volume Needed:</div>
+      <div class="stat-val" id="res-volume">0.0 m³</div>
+      <small style="color: #64748b;" id="res-secondary-vol">(0.0 Cubic Yards)</small>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <label>30kg Bags Equivalent (Home Depot/Rona):</label>
+        <p id="res-bags" style="font-weight:bold;">0 bags</p>
+      </div>
+      <div>
+        <label>Est. Rebar Length (#10M / 10mm):</label>
+        <p id="res-rebar" style="font-weight:bold;">0 meters</p>
+      </div>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid var(--border); margin: 15px 0;">
+
+    <h2>Cost Estimate</h2>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+      <span>Subtotal (Materials + Waste):</span>
+      <strong id="res-subtotal">$0.00 CAD</strong>
+    </div>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+      <span>Tax (HST / GST):</span>
+      <strong id="res-tax">$0.00 CAD</strong>
+    </div>
+    <div style="display: flex; justify-content: space-between; font-size: 1.2rem; color: var(--primary);">
+      <span>Total Estimated Cost:</span>
+      <strong id="res-total">$0.00 CAD</strong>
+    </div>
+
+    <div style="height: 180px; margin-top: 15px;">
+      <canvas id="costChart"></canvas>
+    </div>
+  </div>
+
+  <!-- MONETIZATION MOCKUP: LEAD GENERATION FORM -->
+  <div class="card lead-form-card grid-column: 1 / -1;">
+    <h2>Get Official Ready-Mix Quotes Near You (Nova Scotia)</h2>
+    <p style="font-size:0.9rem; color:#374151;">Need concrete delivered to site in HRM, Truro, or Annapolis Valley? Submit your volume estimate to connect with local ready-mix suppliers.</p>
+    <div class="grid-2">
+      <input type="text" placeholder="Your Name or Company">
+      <input type="email" placeholder="Email Address">
+    </div>
+    <div class="grid-2" style="margin-top: 10px;">
+      <input type="text" placeholder="Delivery Postal Code (e.g. B4E)">
+      <button class="btn" style="background:#166534;" onclick="alert('Lead routed to local supplier database!')">Request Supplier Quotes</button>
+    </div>
+  </div>
+
+  <!-- MONETIZATION MOCKUP: AD BANNER -->
+  <div class="ad-banner">
+    <strong>SPONSOR AD SPACE:</strong> Rent out concrete forms or line pumps in Sackville & HRM! <a href="#">Click here to sponsor this tool ($150/mo)</a>
+  </div>
+
+</div>
+
+<script>
+  let currentUnit = 'metric';
+  let chartInstance = null;
+
+  function setUnits(unit) {
+    currentUnit = unit;
+    document.getElementById('btn-metric').classList.toggle('active', unit === 'metric');
+    document.getElementById('btn-imperial').classList.toggle('active', unit === 'imperial');
+
+    if(unit === 'metric') {
+      document.getElementById('lbl-length').innerText = 'Length (m)';
+      document.getElementById('lbl-width').innerText = 'Width (m)';
+      document.getElementById('lbl-thickness').innerText = 'Thickness / Height (mm)';
+      document.getElementById('lbl-ready-mix').innerText = 'Ready-Mix Cost ($ CAD / m³)';
+    } else {
+      document.getElementById('lbl-length').innerText = 'Length (ft)';
+      document.getElementById('lbl-width').innerText = 'Width (ft)';
+      document.getElementById('lbl-thickness').innerText = 'Thickness / Height (in)';
+      document.getElementById('lbl-ready-mix').innerText = 'Ready-Mix Cost ($ CAD / yd³)';
+    }
+    calculate();
+  }
+
+  function calculate() {
+    let l = parseFloat(document.getElementById('length').value) || 0;
+    let w = parseFloat(document.getElementById('width').value) || 0;
+    let t = parseFloat(document.getElementById('thickness').value) || 0;
+    let wastePct = parseFloat(document.getElementById('waste').value) || 0;
+    let unitCost = parseFloat(document.getElementById('costConcrete').value) || 0;
+    let taxPct = parseFloat(document.getElementById('taxRate').value) || 0;
+
+    let netVolM3 = 0;
+
+    if (currentUnit === 'metric') {
+      // m * m * (mm / 1000)
+      netVolM3 = l * w * (t / 1000);
+    } else {
+      // ft * ft * (in / 12) -> cu ft to m3
+      let cuFt = l * w * (t / 12);
+      netVolM3 = cuFt * 0.0283168;
+    }
+
+    let totalVolM3 = netVolM3 * (1 + (wastePct / 100));
+    let totalVolYards = totalVolM3 * 1.30795;
+
+    // Display Volumes
+    if (currentUnit === 'metric') {
+      document.getElementById('res-volume').innerText = totalVolM3.toFixed(2) + ' m³';
+      document.getElementById('res-secondary-vol').innerText = '(' + totalVolYards.toFixed(2) + ' Cubic Yards)';
+    } else {
+      document.getElementById('res-volume').innerText = totalVolYards.toFixed(2) + ' yd³';
+      document.getElementById('res-secondary-vol').innerText = '(' + totalVolM3.toFixed(2) + ' m³)';
+    }
+
+    // Bag equivalent (30kg bags = ~0.013 m3 per bag)
+    let bagCount = Math.ceil(totalVolM3 / 0.013);
+    document.getElementById('res-bags').innerText = bagCount + ' bags (30kg)';
+
+    // Financials
+    let baseMaterialCost = (currentUnit === 'metric') ? (totalVolM3 * unitCost) : (totalVolYards * unitCost);
+    let taxCost = baseMaterialCost * (taxPct / 100);
+    let grandTotal = baseMaterialCost + taxCost;
+
+    document.getElementById('res-subtotal').innerText = '$' + baseMaterialCost.toFixed(2) + ' CAD';
+    document.getElementById('res-tax').innerText = '$' + taxCost.toFixed(2) + ' CAD';
+    document.getElementById('res-total').innerText = '$' + grandTotal.toFixed(2) + ' CAD';
+
+    updateChart(baseMaterialCost, taxCost);
+  }
+
+  function updateChart(mat, tax) {
+    const ctx = document.getElementById('costChart').getContext('2d');
+    if(chartInstance) chartInstance.destroy();
+
+    chartInstance = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Materials & Waste', 'Tax (HST/GST)'],
+        datasets: [{
+          data: [mat, tax],
+          backgroundColor: ['#c85a17', '#2b3a42']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  }
+
+  // Initial Run
+  calculate();
+</script>
+</body>
+</html>
